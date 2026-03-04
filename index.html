@@ -485,8 +485,8 @@
             <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#D4B483;margin-bottom:10px;line-height:1.3;">Mais do que um espaço — uma experiência completa.</div>
             <p style="font-size:12px;font-weight:300;line-height:1.8;color:rgba(255,255,255,0.65);margin-bottom:20px;">Nossos projetos personalizados transformam cada detalhe do seu evento em algo verdadeiramente único. Decoração, iluminação, experiência dos convidados — tudo pensado exclusivamente para você. Quem experimenta, não imagina de outra forma. <strong style="color:#D4B483;">Gostaria de descobrir como podemos criar algo especial para o seu evento?</strong></p>
             <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <button type="button" onclick="escolherProjeto(true)" style="flex:1;min-width:120px;background:var(--gold);color:#fff;border:none;padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Quero saber mais!</button>
-              <button type="button" onclick="escolherProjeto(false)" style="flex:1;min-width:120px;background:transparent;color:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.15);padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:400;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Apenas o aluguel</button>
+              <button type="button" id="btn-sim" onclick="escolherProjeto(true)" style="flex:1;min-width:120px;background:#8C6E3A;color:#fff;border:2px solid #B8975A;padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;">✓ Quero saber mais!</button>
+              <button type="button" id="btn-nao" onclick="escolherProjeto(false)" style="flex:1;min-width:120px;background:transparent;color:rgba(255,255,255,0.45);border:2px solid rgba(255,255,255,0.15);padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:400;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Apenas o aluguel</button>
             </div>
           </div>
         </div>
@@ -602,7 +602,8 @@
     if(val){
       card.style.display = 'block';
       card.style.animation = 'fadein .4s ease both';
-      projetoEscolhido = null; // reset escolha anterior
+      projetoEscolhido = null;
+      preselecionarSim();
     } else {
       card.style.display = 'none';
       projetoEscolhido = null;
@@ -612,23 +613,32 @@
   function escolherProjeto(quer){
     projetoEscolhido = quer;
     destinoWA = quer ? WA_VINICIUS : WA_ALUGUEL;
-    const btnSim = document.querySelector('#card-projeto button:first-of-type');
-    const btnNao = document.querySelector('#card-projeto button:last-of-type');
-    // Reset ambos primeiro
-    btnSim.style.background='var(--gold)';
-    btnSim.style.opacity='1';
-    btnNao.style.borderColor='rgba(255,255,255,0.15)';
-    btnNao.style.color='rgba(255,255,255,0.45)';
+    const btnSim = document.getElementById('btn-sim');
+    const btnNao = document.getElementById('btn-nao');
+    // Reset completo dos dois
+    btnSim.style.background='transparent';
+    btnSim.style.color='rgba(255,255,255,0.45)';
+    btnSim.style.border='2px solid rgba(255,255,255,0.15)';
+    btnSim.style.fontWeight='400';
     btnNao.style.background='transparent';
-    // Aplicar estado selecionado
-    if(quer){
-      btnSim.style.background='#8C6E3A';
-      btnNao.style.opacity='0.4';
-    } else {
-      btnNao.style.borderColor='rgba(184,151,90,0.6)';
-      btnNao.style.color='#D4B483';
-      btnSim.style.opacity='0.4';
-    }
+    btnNao.style.color='rgba(255,255,255,0.45)';
+    btnNao.style.border='2px solid rgba(255,255,255,0.15)';
+    btnNao.style.fontWeight='400';
+    // Aplicar selecionado
+    const btnAtivo = quer ? btnSim : btnNao;
+    btnAtivo.style.background='#8C6E3A';
+    btnAtivo.style.color='#fff';
+    btnAtivo.style.border='2px solid #B8975A';
+    btnAtivo.style.fontWeight='600';
+    // Texto com checkmark
+    btnSim.textContent = quer ? '✓ Quero saber mais!' : 'Quero saber mais!';
+    btnNao.textContent = !quer ? '✓ Apenas o aluguel' : 'Apenas o aluguel';
+  }
+
+  // Pré-selecionar "Quero saber mais" ao exibir o card
+  function preselecionarSim(){
+    projetoEscolhido = true;
+    destinoWA = WA_VINICIUS;
   }
 
   function enviarWhatsApp(){
