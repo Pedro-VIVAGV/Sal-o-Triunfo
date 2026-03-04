@@ -454,17 +454,43 @@
         </div>
         <div class="form-group">
           <label>Tipo de Evento *</label>
-          <select id="tipo">
+          <select id="tipo" onchange="onTipoChange()">
             <option value="">Selecione o tipo de evento</option>
-            <option>Baile de Formatura</option>
-            <option>Colação de Grau</option>
-            <option>Confraternização</option>
-            <option>Casamento</option>
-            <option>Aniversário</option>
-            <option>Evento Corporativo</option>
-            <option>Outro</option>
+            <option value="aluguel">Aluguel do Salão</option>
+            <option value="aniversario">Aniversário</option>
+            <option value="confraternizacao">Confraternização</option>
+            <option value="casamento">Casamento</option>
+            <option value="corporativo">Evento Corporativo</option>
+            <option value="formatura">Baile de Formatura</option>
+            <option value="outro">Outro</option>
           </select>
         </div>
+
+        <!-- Bloco extra aparece só quando seleciona Aluguel -->
+        <div id="bloco-aluguel" style="display:none;">
+          <div class="form-group">
+            <label>Qual será o tipo de evento no salão? *</label>
+            <select id="tipo-aluguel" onchange="onTipoAluguelChange()">
+              <option value="">Selecione</option>
+              <option>Aniversário</option>
+              <option>Confraternização</option>
+              <option>Casamento</option>
+              <option>Evento Corporativo</option>
+              <option>Baile de Formatura</option>
+              <option>Outro</option>
+            </select>
+          </div>
+          <div id="card-projeto" style="display:none;background:linear-gradient(135deg,#1A1612,#2D2419);border:1px solid rgba(184,151,90,0.35);border-radius:12px;padding:24px;margin-bottom:20px;">
+            <div style="font-size:18px;margin-bottom:8px;">✨</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#D4B483;margin-bottom:10px;line-height:1.3;">Mais do que um espaço — uma experiência completa.</div>
+            <p style="font-size:12px;font-weight:300;line-height:1.8;color:rgba(255,255,255,0.65);margin-bottom:20px;">Nossos projetos personalizados transformam cada detalhe do seu evento em algo verdadeiramente único. Decoração, iluminação, experiência dos convidados — tudo pensado exclusivamente para você. Quem experimenta, não imagina de outra forma. <strong style="color:#D4B483;">Gostaria de descobrir como podemos criar algo especial para o seu evento?</strong></p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button type="button" onclick="escolherProjeto(true)" style="flex:1;min-width:120px;background:var(--gold);color:#fff;border:none;padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Quero saber mais!</button>
+              <button type="button" onclick="escolherProjeto(false)" style="flex:1;min-width:120px;background:transparent;color:rgba(255,255,255,0.45);border:1px solid rgba(255,255,255,0.15);padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:400;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all .3s;">Apenas o aluguel</button>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group">
           <label>Data Pretendida</label>
           <input type="date" id="data">
@@ -548,18 +574,98 @@
   document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
   // WHATSAPP FORM
+  const WA_ALUGUEL = '5533999512105';   // WhatsApp atual (aluguel sem projeto)
+  const WA_VINICIUS = '5533996658633'; // Vinícius (projetos personalizados + demais eventos)
+  let destinoWA = WA_VINICIUS;          // padrão
+  let projetoEscolhido = null;          // null = ainda não escolheu (bloco aluguel)
+
+  function onTipoChange(){
+    const tipo = document.getElementById('tipo').value;
+    const bloco = document.getElementById('bloco-aluguel');
+    const cardProjeto = document.getElementById('card-projeto');
+    if(tipo === 'aluguel'){
+      bloco.style.display = 'block';
+      cardProjeto.style.display = 'none';
+      document.getElementById('tipo-aluguel').value = '';
+      projetoEscolhido = null;
+      destinoWA = WA_ALUGUEL; // padrão enquanto não escolhe
+    } else {
+      bloco.style.display = 'none';
+      projetoEscolhido = null;
+      destinoWA = WA_VINICIUS; // qualquer outro evento vai para Vinícius
+    }
+  }
+
+  function onTipoAluguelChange(){
+    const val = document.getElementById('tipo-aluguel').value;
+    const card = document.getElementById('card-projeto');
+    if(val){
+      card.style.display = 'block';
+      card.style.animation = 'fadein .4s ease both';
+      projetoEscolhido = null; // reset escolha anterior
+    } else {
+      card.style.display = 'none';
+      projetoEscolhido = null;
+    }
+  }
+
+  function escolherProjeto(quer){
+    projetoEscolhido = quer;
+    if(quer){
+      destinoWA = WA_VINICIUS;
+    } else {
+      destinoWA = WA_ALUGUEL;
+    }
+    // Feedback visual nos botões
+    const btnSim = document.querySelector('#card-projeto button:first-of-type');
+    const btnNao = document.querySelector('#card-projeto button:last-of-type');
+    if(quer){
+      btnSim.style.background='#8C6E3A';
+      btnNao.style.color='rgba(255,255,255,0.25)';
+    } else {
+      btnNao.style.borderColor='rgba(184,151,90,0.5)';
+      btnNao.style.color='rgba(255,255,255,0.7)';
+      btnSim.style.opacity='0.5';
+    }
+  }
+
   function enviarWhatsApp(){
-    const nome=document.getElementById('nome').value.trim();
-    const telefone=document.getElementById('telefone').value.trim();
-    const tipo=document.getElementById('tipo').value;
-    const data=document.getElementById('data').value;
-    const mensagem=document.getElementById('mensagem').value.trim();
-    if(!nome||!telefone||!tipo){alert('Por favor preencha nome, telefone e tipo de evento.');return;}
-    const dataFormatada=data?new Date(data+'T12:00:00').toLocaleDateString('pt-BR'):'Não informada';
-    const texto=`Olá! Gostaria de solicitar um orçamento para o *Salão Triunfo*.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Tipo de Evento:* ${tipo}\n*Data Pretendida:* ${dataFormatada}${mensagem?'\n*Mensagem:* '+mensagem:''}`;
-    document.getElementById('contact-form').style.display='none';
-    document.getElementById('form-success').style.display='block';
-    setTimeout(()=>window.open('https://wa.me/5533999512105?text='+encodeURIComponent(texto),'_blank'),800);
+    const nome = document.getElementById('nome').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const tipo = document.getElementById('tipo').value;
+    const data = document.getElementById('data').value;
+    const mensagem = document.getElementById('mensagem').value.trim();
+
+    if(!nome || !telefone || !tipo){
+      alert('Por favor preencha nome, telefone e tipo de evento.');return;
+    }
+
+    // Se selecionou aluguel, exige o subtipo
+    if(tipo === 'aluguel'){
+      const tipoAluguel = document.getElementById('tipo-aluguel').value;
+      if(!tipoAluguel){ alert('Por favor selecione o tipo de evento no salão.'); return; }
+      // Se não escolheu sim/não no card, obriga
+      if(projetoEscolhido === null){ alert('Por favor selecione se deseja saber mais sobre nossos projetos personalizados.'); return; }
+    }
+
+    const tiposLabel = {
+      aluguel:'Aluguel do Salão', aniversario:'Aniversário',
+      confraternizacao:'Confraternização', casamento:'Casamento',
+      corporativo:'Evento Corporativo', formatura:'Baile de Formatura', outro:'Outro'
+    };
+    const tipoTexto = tiposLabel[tipo] || tipo;
+    const tipoAluguelTexto = tipo === 'aluguel' ? document.getElementById('tipo-aluguel').value : '';
+    const dataFormatada = data ? new Date(data+'T12:00:00').toLocaleDateString('pt-BR') : 'Não informada';
+
+    let texto = `Olá! Gostaria de solicitar um orçamento para o *Salão Triunfo*.\n\n*Nome:* ${nome}\n*Telefone:* ${telefone}\n*Interesse:* ${tipoTexto}`;
+    if(tipoAluguelTexto) texto += `\n*Tipo de Evento:* ${tipoAluguelTexto}`;
+    if(tipo === 'aluguel' && projetoEscolhido) texto += `\n*Interesse em Projeto Personalizado:* Sim ✨`;
+    texto += `\n*Data Pretendida:* ${dataFormatada}`;
+    if(mensagem) texto += `\n*Mensagem:* ${mensagem}`;
+
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+    setTimeout(()=>window.open('https://wa.me/'+destinoWA+'?text='+encodeURIComponent(texto),'_blank'), 800);
   }
 
   // MOBILE MENU
