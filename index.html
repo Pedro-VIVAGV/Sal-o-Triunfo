@@ -611,21 +611,23 @@
 
   function escolherProjeto(quer){
     projetoEscolhido = quer;
-    if(quer){
-      destinoWA = WA_VINICIUS;
-    } else {
-      destinoWA = WA_ALUGUEL;
-    }
-    // Feedback visual nos botões
+    destinoWA = quer ? WA_VINICIUS : WA_ALUGUEL;
     const btnSim = document.querySelector('#card-projeto button:first-of-type');
     const btnNao = document.querySelector('#card-projeto button:last-of-type');
+    // Reset ambos primeiro
+    btnSim.style.background='var(--gold)';
+    btnSim.style.opacity='1';
+    btnNao.style.borderColor='rgba(255,255,255,0.15)';
+    btnNao.style.color='rgba(255,255,255,0.45)';
+    btnNao.style.background='transparent';
+    // Aplicar estado selecionado
     if(quer){
       btnSim.style.background='#8C6E3A';
-      btnNao.style.color='rgba(255,255,255,0.25)';
+      btnNao.style.opacity='0.4';
     } else {
-      btnNao.style.borderColor='rgba(184,151,90,0.5)';
-      btnNao.style.color='rgba(255,255,255,0.7)';
-      btnSim.style.opacity='0.5';
+      btnNao.style.borderColor='rgba(184,151,90,0.6)';
+      btnNao.style.color='#D4B483';
+      btnSim.style.opacity='0.4';
     }
   }
 
